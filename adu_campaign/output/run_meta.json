@@ -1,0 +1,260 @@
+{
+  "redfin": {
+    "windows": [
+      "2026-05-31",
+      "2026-02-28",
+      "2025-11-30",
+      "2025-08-31"
+    ],
+    "last_updated": "2026-06-02 14:33:24.470 Z",
+    "latest_period_end": "2026-05-31",
+    "coverage": "1620 CA ZIPs with sales in trailing 12 mo"
+  },
+  "zillow": {
+    "note": "NOT USED - BLOCKED by this environment's network policy; cross-check pending",
+    "coverage": "0%",
+    "vintage": "unverified"
+  },
+  "zcta": {
+    "url": "https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/ca_california_zip_codes_geo.min.json",
+    "n": 1763
+  },
+  "footprints": {
+    "coverage": "13,668,798 CA footprints assigned to ZIPs",
+    "n": 13668798
+  },
+  "parcels": {
+    "Alameda": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/alameda.gpkg)"
+    },
+    "Alpine": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/alpine.gpkg)"
+    },
+    "Amador": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/amador.gpkg)"
+    },
+    "Butte": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/butte.gpkg)"
+    },
+    "Calaveras": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/calaveras.gpkg)"
+    },
+    "Colusa": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/colusa.gpkg)"
+    },
+    "Contra Costa": {
+      "status": "no data",
+      "status_text": "NO DATA (SFR use-code rule unverified for this source; not processed)"
+    },
+    "Del Norte": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/del_norte.gpkg)"
+    },
+    "El Dorado": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/el_dorado.gpkg)"
+    },
+    "Fresno": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/fresno.gpkg)"
+    },
+    "Glenn": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/glenn.gpkg)"
+    },
+    "Humboldt": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/humboldt.gpkg)"
+    },
+    "Imperial": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/imperial.gpkg)"
+    },
+    "Inyo": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/inyo.gpkg)"
+    },
+    "Kern": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/kern.gpkg)"
+    },
+    "Kings": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/kings.gpkg)"
+    },
+    "Lake": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/lake.gpkg)"
+    },
+    "Lassen": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/lassen.gpkg)"
+    },
+    "Los Angeles": {
+      "status": "no data",
+      "status_text": "NO DATA (BLOCKED by this environment's network policy (proxy 403))"
+    },
+    "Madera": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/madera.gpkg)"
+    },
+    "Marin": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/marin.gpkg)"
+    },
+    "Mariposa": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/mariposa.gpkg)"
+    },
+    "Mendocino": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/mendocino.gpkg)"
+    },
+    "Merced": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/merced.gpkg)"
+    },
+    "Modoc": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/modoc.gpkg)"
+    },
+    "Mono": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/mono.gpkg)"
+    },
+    "Monterey": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/monterey.gpkg)"
+    },
+    "Napa": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/napa.gpkg)"
+    },
+    "Nevada": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/nevada.gpkg)"
+    },
+    "Orange": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/orange.gpkg)"
+    },
+    "Placer": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/placer.gpkg)"
+    },
+    "Plumas": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/plumas.gpkg)"
+    },
+    "Riverside": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/riverside.gpkg)"
+    },
+    "Sacramento": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/sacramento.gpkg)"
+    },
+    "San Benito": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/san_benito.gpkg)"
+    },
+    "San Bernardino": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/san_bernardino.gpkg)"
+    },
+    "San Diego": {
+      "status": "no data",
+      "status_text": "NO DATA (BLOCKED by this environment's network policy (proxy 403))"
+    },
+    "San Francisco": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/san_francisco.gpkg)"
+    },
+    "San Joaquin": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/san_joaquin.gpkg)"
+    },
+    "San Luis Obispo": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/san_luis_obispo.gpkg)"
+    },
+    "San Mateo": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/san_mateo.gpkg)"
+    },
+    "Santa Barbara": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/santa_barbara.gpkg)"
+    },
+    "Santa Clara": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/santa_clara.gpkg)"
+    },
+    "Santa Cruz": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/santa_cruz.gpkg)"
+    },
+    "Shasta": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/shasta.gpkg)"
+    },
+    "Sierra": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/sierra.gpkg)"
+    },
+    "Siskiyou": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/siskiyou.gpkg)"
+    },
+    "Solano": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/solano.gpkg)"
+    },
+    "Sonoma": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/sonoma.gpkg)"
+    },
+    "Stanislaus": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/stanislaus.gpkg)"
+    },
+    "Sutter": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/sutter.gpkg)"
+    },
+    "Tehama": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/tehama.gpkg)"
+    },
+    "Trinity": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/trinity.gpkg)"
+    },
+    "Tulare": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/tulare.gpkg)"
+    },
+    "Tuolumne": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/tuolumne.gpkg)"
+    },
+    "Ventura": {
+      "status": "no data",
+      "status_text": "NO DATA ('portal' source needs a manual export to data/parcels/ventura.gpkg)"
+    },
+    "Yolo": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/yolo.gpkg)"
+    },
+    "Yuba": {
+      "status": "no data",
+      "status_text": "NO DATA (no automated source configured; place a county or Regrid export at data/parcels/yuba.gpkg)"
+    }
+  }
+}
