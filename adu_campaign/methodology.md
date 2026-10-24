@@ -306,7 +306,32 @@ Flags:
    * Valpak delivers by carrier route, so a ZIP-level count is a planning estimate.
 6. **Interim ranking** is a market-activity proxy (see §5). Do not read it as a lot count.
 
-## 10. Reproducing / extending
+## 10. Address-level footprint files
+
+`output/addresses/` holds 7,275,231 unique Overture address points in the 736 mailable ZIPs, split
+into 14 Excel files by focus region (max ~800k rows each; Excel's limit is 1,048,576).
+
+| Column | Meaning |
+|---|---|
+| Existing structure footprint | Ground-floor area of the building polygon containing the address point (sq ft, EPSG:3310 geodesic-safe area). **Not interior floor area.** |
+| Lot size | **"no data"**: no parcel data (see §9). Fill column H and the next column recalculates. |
+| % of lot built | Formula `footprint / lot size`; shows "no data" until lot size exists. |
+| Residential evidence | Overture building class. **Not zoning.** Zoning needs parcel/zoning layers, which were unavailable. |
+
+Match rates and limits:
+
+* 77% of addresses (5.61M) fall inside a footprint; 1.67M have no footprint at the address point
+  (shown as "no data"). 2.46M are tagged residential, 2.90M have no class tag (kept), 253k are
+  tagged non-residential or outbuilding (kept and labelled, not dropped).
+* Multiple units at one address share the building's full footprint.
+* A detached garage or ADU is a separate polygon and is not added to the main house.
+* Some footprints are implausible (max 14M sq ft: a merged or mis-mapped polygon). The
+  "house-scale" column flags 600–6,000 sq ft.
+* Only 9% of addresses have a neighborhood name: Overture publishes neighborhood polygons for
+  few areas. The ZIP-level neighborhood list remains on the main workbook.
+* The Alameda County files are thin (577k addresses): Overture address coverage there is sparse.
+
+## 11. Reproducing / extending
 
 ```bash
 python -m adu_campaign.fetch_overture        # divisions, addresses, buildings (S3)

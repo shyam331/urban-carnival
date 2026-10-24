@@ -82,37 +82,50 @@ def load_addresses(data_dir, zcta, mailable):
     return j.drop_duplicates(key).reset_index(drop=True)
 
 
-def match_buildings(addr, data_dir):
-    """Add footprint_sqft / building class / building id to each address (containing footprint)."""
+def match_buildings(addr, data_dir, chunk=1_000_000):
+    """Add footprint_sqft / building class / building id to each address (containing footprint).
+
+    Each building file is read in row-group batches so peak memory stays bounded; a building
+    can straddle batches only by its own row group, so every polygon is tested exactly once.
+    """
     addr = addr.copy()
-    addr["footprint_sqft"] = np.nan
-    addr["building_id"] = None
-    addr["building_class"] = None
-    addr["building_subtype"] = None
-    xy = np.column_stack([addr.lon.values, addr.lat.values])
+    n = len(addr)
+    fp = np.full(n, np.nan)
+    bid = np.empty(n, dtype=object)
+    bcl = np.empty(n, dtype=object)
+    bst = np.empty(n, dtype=object)
+    x, y = addr.lon.values, addr.lat.values
+    done = np.zeros(n, dtype=bool)
     for f in sorted((data_dir / "overture" / "buildings").glob("buildings_*.parquet")):
-        t = pq.read_table(f)
-        if t.num_rows == 0 or "geometry" not in t.column_names:
+        pf = pq.ParquetFile(f)
+        if pf.metadata.num_rows == 0 or "geometry" not in pf.schema_arrow.names:
             continue
-        geoms = shapely.from_wkb(t.column("geometry").to_numpy(zero_copy_only=False))
-        minx, miny, maxx, maxy = shapely.total_bounds(geoms)
-        sel = np.where((xy[:, 0] >= minx) & (xy[:, 0] <= maxx) & (xy[:, 1] >= miny) & (xy[:, 1] <= maxy))[0]
-        if not len(sel):
-            continue
-        tree = shapely.STRtree(geoms)
-        pts = shapely.points(xy[sel, 0], xy[sel, 1])
-        pi, bi = tree.query(pts, predicate="within")
-        if not len(pi):
-            continue
-        first = pd.Series(bi, index=pi).groupby(level=0).first()  # one building per address
-        rows = sel[first.index.values]
-        b = first.values
-        area = (gpd.GeoSeries(geoms[b], crs=4326).to_crs(C.EQUAL_AREA_CRS).area * C.SQFT_PER_SQM).values
-        addr.loc[rows, "footprint_sqft"] = area
-        addr.loc[rows, "building_id"] = np.asarray(t.column("id").to_pylist(), dtype=object)[b]
-        addr.loc[rows, "building_class"] = np.asarray(t.column("class").to_pylist(), dtype=object)[b]
-        addr.loc[rows, "building_subtype"] = np.asarray(t.column("subtype").to_pylist(), dtype=object)[b]
-        print(f"  {f.name}: matched {len(rows)} of {len(sel)} candidate addresses", flush=True)
+        hits = 0
+        for batch in pf.iter_batches(batch_size=250_000, columns=["id", "geometry", "class", "subtype", "bbox"]):
+            bb = batch.column("bbox")
+            xmin = pc.min(pc.struct_field(bb, "xmin")).as_py(); xmax = pc.max(pc.struct_field(bb, "xmax")).as_py()
+            ymin = pc.min(pc.struct_field(bb, "ymin")).as_py(); ymax = pc.max(pc.struct_field(bb, "ymax")).as_py()
+            sel = np.where(~done & (x >= xmin) & (x <= xmax) & (y >= ymin) & (y <= ymax))[0]
+            if not len(sel):
+                continue
+            geoms = shapely.from_wkb(batch.column("geometry").to_numpy(zero_copy_only=False))
+            tree = shapely.STRtree(geoms)
+            pi, bi = tree.query(shapely.points(x[sel], y[sel]), predicate="within")
+            if not len(pi):
+                continue
+            first = pd.Series(bi, index=pi).groupby(level=0).first()
+            rows = sel[first.index.values]
+            b = first.values
+            area = (gpd.GeoSeries(geoms[b], crs=4326).to_crs(C.EQUAL_AREA_CRS).area * C.SQFT_PER_SQM).values
+            fp[rows] = area
+            bid[rows] = np.asarray(batch.column("id").to_pylist(), dtype=object)[b]
+            bcl[rows] = np.asarray(batch.column("class").to_pylist(), dtype=object)[b]
+            bst[rows] = np.asarray(batch.column("subtype").to_pylist(), dtype=object)[b]
+            done[rows] = True
+            hits += len(rows)
+            del geoms, tree
+        print(f"  {f.name}: +{hits} matched (total {int(done.sum()):,} of {n:,})", flush=True)
+    addr["footprint_sqft"], addr["building_id"], addr["building_class"], addr["building_subtype"] = fp, bid, bcl, bst
     return addr
 
 
@@ -126,6 +139,10 @@ def residential_evidence(df):
           np.where(cls.isin(RES_CLASSES) | (sub == "residential"), "Overture class: residential",
                    "class not tagged (unknown)")))
     return out
+
+
+def _s(v):
+    return v if isinstance(v, str) else ""
 
 
 def write_xlsx(df, path, title):
@@ -147,9 +164,9 @@ def write_xlsx(df, path, title):
     ws.freeze_panes(1, 1)
     for i, r in enumerate(df.itertuples(index=False), 1):
         ws.write_string(i, 0, r.address, base)
-        ws.write_string(i, 1, r.city or "", base)
+        ws.write_string(i, 1, _s(r.city), base)
         ws.write_string(i, 2, r.zip, base)
-        ws.write_string(i, 3, r.neighborhood or "", base)
+        ws.write_string(i, 3, _s(r.neighborhood), base)
         ws.write_string(i, 4, r.tier, base)
         ws.write_string(i, 5, r.res_evidence, base)
         if pd.notna(r.footprint_sqft):
@@ -159,8 +176,8 @@ def write_xlsx(df, path, title):
         ws.write_string(i, 7, "no data", base)  # lot size: needs parcel data
         ws.write_formula(i, 8, f'=IF(AND(ISNUMBER(G{i + 1}),ISNUMBER(H{i + 1})),G{i + 1}/H{i + 1},"no data")', pct)
         ws.write_string(i, 9, r.scale_flag, base)
-        ws.write_string(i, 10, r.building_class or "", base)
-        ws.write_string(i, 11, r.building_id or "", base)
+        ws.write_string(i, 10, _s(r.building_class), base)
+        ws.write_string(i, 11, _s(r.building_id), base)
     ws.autofilter(0, 0, len(df), len(heads) - 1)
     note = wb.add_worksheet("Read me")
     for k, line in enumerate([
@@ -203,15 +220,7 @@ def build(data_dir=None, out_dir=None, max_rows=1_000_000):
     cols = ["address", "city", "zip", "neighborhood", "tier", "res_evidence", "footprint_sqft", "scale_flag",
             "building_class", "building_id", "county", "region", "rank"]
     addr[cols].to_parquet(out_dir / "addresses_all.parquet")
-    files = []
-    for region, g in addr.groupby("region", sort=False):
-        n = int(np.ceil(len(g) / max_rows))
-        for p, chunk in enumerate(np.array_split(g, n), 1):
-            name = f"addresses_{region.split(' (')[0].replace(' / ', '_').replace(' ', '_').replace('&', 'and')}" \
-                   f"{'' if n == 1 else f'_part{p}'}.xlsx"
-            write_xlsx(chunk, out_dir / name, f"{region}: {len(chunk):,} addresses ({chunk.zip.nunique()} ZIPs)")
-            files.append((name, region, len(chunk), chunk.zip.nunique()))
-            print("wrote", name, len(chunk), flush=True)
+    files = write_all(addr[cols], out_dir, max_rows)
     idx = pd.DataFrame(files, columns=["file", "region", "addresses", "zips"])
     idx.to_csv(out_dir / "index.csv", index=False)
     stats = {
@@ -222,6 +231,21 @@ def build(data_dir=None, out_dir=None, max_rows=1_000_000):
     }
     print(stats)
     return idx, stats
+
+
+def write_all(addr, out_dir, max_rows=1_000_000):
+    files = []
+    for region, g in addr.groupby("region", sort=False):
+        n = int(np.ceil(len(g) / max_rows))
+        bounds = np.linspace(0, len(g), n + 1).astype(int)
+        for p in range(n):
+            chunk = g.iloc[bounds[p]:bounds[p + 1]]
+            slug = region.split(" (")[0].replace(" / ", "_").replace(" ", "_").replace("&", "and")
+            name = f"addresses_{slug}{'' if n == 1 else f'_part{p + 1}'}.xlsx"
+            write_xlsx(chunk, out_dir / name, f"{region}: {len(chunk):,} addresses ({chunk.zip.nunique()} ZIPs)")
+            files.append((name, region, len(chunk), chunk.zip.nunique()))
+            print("wrote", name, len(chunk), flush=True)
+    return files
 
 
 def _neighborhood_polys(data_dir):
@@ -243,7 +267,11 @@ def _assign_neighborhood(addr, hoods, z):
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "build"
-    if cmd == "fetch":
+    if cmd == "write":  # re-write Excel files from the cached matched table
+        od = C.OUTPUT_DIR / "addresses"
+        a = pd.read_parquet(od / "addresses_all.parquet")
+        pd.DataFrame(write_all(a, od), columns=["file", "region", "addresses", "zips"]).to_csv(od / "index.csv", index=False)
+    elif cmd == "fetch":
         fetch(C.DATA_DIR / "overture" / ADDR_DIR)
     else:
         build()
